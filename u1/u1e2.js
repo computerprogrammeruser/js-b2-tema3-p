@@ -74,3 +74,70 @@ const PROJECT_LIST = [
 ];
 
 //Escribe aquí tu solución / escriviu aquí la vostra solució:
+
+function renderProjects() {
+
+    const projectListContainer = document.querySelector('.js-project-list');
+
+    if (!projectListContainer) {
+        throw new Error('projectListContainer error.');
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    const projectTemplate = document.getElementById('tpl-project');
+    const tagTemplate = document.getElementById('tpl-tag');
+
+    if(!projectTemplate || !tagTemplate) {
+        throw new Error('projectTemplate or tagTemplate error.');
+    }
+
+    PROJECT_LIST.forEach(project => {
+        
+        const projectNodeClone = projectTemplate.content.cloneNode(true);
+        const projectDiv = projectNodeClone.querySelector('.js-project');
+
+        projectDiv.dataset.id = project.id;
+        projectDiv.dataset.tags = project.tags.join(',');
+        projectDiv.dataset.search = project.search.join(',');
+        projectDiv.dataset.archived = project.archived;
+
+        const name = projectNodeClone.querySelector('.js-name');
+        name.textContent = project.name;
+
+        const progress = projectNodeClone.querySelector('.js-progress');
+        progress.textContent = project.progress;
+
+        const excerpt = projectNodeClone.querySelector('.js-excerpt');
+        excerpt.innerHTML = project.excerpt;
+
+        const category = CATEGORY_LIST.find(category => category.id === project.categoryId);
+        const categoryInformation = projectNodeClone.querySelector('.js-category');
+        categoryInformation.textContent = category ? category.name : '';
+
+        const tags = projectNodeClone.querySelector('.js-tags');
+        project.tags.forEach(tag => {
+            const tagNode = tagTemplate.content.cloneNode(true);
+            const tagLink = tagNode.querySelector('.js-tag-link');
+            tagLink.dataset.tag = tag;
+            tagLink.textContent = tag;
+            tags.appendChild(tagNode);
+        });
+
+        if (project.archived) {
+            projectDiv.classList.add('archived');
+        }
+
+        if (project.progress === 100) {
+            projectDiv.classList.add('completed');
+        }
+
+        fragment.appendChild(projectNodeClone);
+    });
+
+    projectListContainer.appendChild(fragment);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderProjects();
+});
